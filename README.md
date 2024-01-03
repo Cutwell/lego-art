@@ -1,4 +1,4 @@
-# <img src="https://raw.githubusercontent.com/Cutwell/lego-art/main/logo.png" style="width:64px;padding-right:20px;margin-bottom:-8px;"> LEGO Art
+# <img src="https://raw.githubusercontent.com/Cutwell/lego-art/main/logo.png" style="width:32px;padding-right:20px;margin-bottom:-8px;"> LEGO Art
  Generate instructions/templates for Lego mosaics from custom images.
 
 <!-- Find new badges at https://shields.io/badges -->
