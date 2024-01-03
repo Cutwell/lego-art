@@ -1,12 +1,15 @@
-# <img src="https://raw.githubusercontent.com/Cutwell/lego-art/main/logo.png" style="width:64px;padding-right:20px;margin-bottom:-8px;"> LEGO Art
+# <img src="https://raw.githubusercontent.com/Cutwell/lego-art/main/logo.png" style="width:32px;padding-right:20px;margin-bottom:-8px;"> LEGO Art
  Generate instructions/templates for Lego mosaics from custom images.
 
 <!-- Find new badges at https://shields.io/badges -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+- Generate mosaics / instructions from images.
+- Make custom LEGO art by [buying bricks](https://www.lego.com/en-gb/pick-and-build/pick-a-brick?perPage=400&designNumber=35381) to match output colors.
+
 ## How to use
 
-1. Visit a live demo [here](cutwell.github.io/lego-art).
+1. Visit a live demo [here](https://cutwell.github.io/lego-art/).
 
 2. Upload an image.
 
