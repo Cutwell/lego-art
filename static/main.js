@@ -6,13 +6,60 @@ const scaledCtx = scaledCanvas.getContext('2d');
 const legoBoard = document.getElementById('legoBoard');
 const legoBoardColorButton = document.getElementById('legoBoardColorButton');
 const colorKeyDiv = document.getElementById('colorKey');
-const outputDiv = document.getElementById('output');
+const instructionsDiv = document.getElementById('instructions');
 const heightInput = document.getElementById('customHeight');
 const widthInput = document.getElementById('customWidth');
 var colorKey = {};
+var colorKeyCount = {};
 var customWidth = 16;
 var customHeight = 16;
 var customColor = 'white';
+
+const bricks = {
+	'6284070': '#7f7f7f',
+	'6284071': '#b3b3b3',
+	'6284572': '#ffffff',
+	'6284573': '#d9c58a',
+	'6284574': '#ff2928',
+	'6284575': '#4d95fb',
+	'6284577': '#ffed02',
+	'6284582': '#ff9634',
+	'6284583': '#b9e74f',
+	'6284584': '#506c9d',
+	'6284585': '#88323f',
+	'6284586': '#835138',
+	'6284587': '#feb5f0',
+	'6284589': '#9c734f',
+	'6284592': '#fffbe0',
+	'6284595': '#7a803a',
+	'6284596': '#7e7e7e',
+	'6284598': '#ddec9b',
+	'6284602': '#90bbf7',
+	'6311436': '#ff719d',
+	'6311437': '#1fa6a0',
+	'6315196': '#ffddb9',
+	'6322813': '#503b16',
+	'6322818': '#d8f9f0',
+	'6322819': '#71bddc',
+	'6322820': '#d0a7e3',
+	'6322821': '#fc44bf',
+	'6322822': '#ffbf31',
+	'6322823': '#c1e0fe',
+	'6322824': '#3f99cc',
+	'6322840': '#ac603d',
+	'6322841': '#a69579',
+	'6322842': '#99a6af',
+	'6343472': '#e79f71',
+	'6343806': '#fffe88',
+	'6353793': '#6cd554',
+	'6376825': '#fffd04',
+	'6396247': '#38c764',
+}
+
+function getBrickLink(uuid) {
+	let url = `https://www.lego.com/en-gb/pick-and-build/pick-a-brick?designNumber=35381&query=${uuid}`;
+	return url;
+}
 
 function handleHeightWidthChange() {
 	// remove the outdated width and height class
@@ -42,7 +89,7 @@ function setBoardColor(color) {
 	customColor = color;
 	legoBoard.classList.add(`b-${customColor}`);
 	let buttonTextColor = (color == 'white') ? 't-black' : 't-white';
-	legoBoardColorButton.className = `btn btn-secondary dropdown-toggle bg-${color} ${buttonTextColor}`
+	legoBoardColorButton.className = `btn btn-secondary dropdown-toggle pt-sans bg-${color} ${buttonTextColor}`
 
 	let dropdownToggle = document.getElementById('legoBoardColorButton');
 	let dropdown = new bootstrap.Dropdown(dropdownToggle);
@@ -59,7 +106,6 @@ function handleImageUpload() {
 
 			pixelArtCanvas.width = widthPixels;
 			pixelArtCanvas.height = heightPixels;
-			colorKeyDiv.style.height = `${heightPixels}px`;
 
 			var img = new Image();
 			img.onload = function () {
@@ -93,6 +139,7 @@ function drawPixelArt(width, height) {
 	var offsetX = 0;
 	var offsetY = 0;
 	var colorKey = {};
+	var colorKeyCount = {};
 	let colorNumber = 1;
 
 	pixelArtCtx.clearRect(0, 0, width, height); // Clear the canvas before redrawing
@@ -106,8 +153,11 @@ function drawPixelArt(width, height) {
 			var key = findColorKey(colorKey, pixelColor);
 			if (key === null) {
 				key = `color_${colorNumber}`;
-				colorKey[`color_${colorNumber}`] = pixelColor;
+				colorKey[key] = pixelColor;
+				colorKeyCount[key] = 1;
 				colorNumber++;
+			} else {
+				colorKeyCount[key]++;
 			}
 
 			let color = colorKey[key];
@@ -118,12 +168,47 @@ function drawPixelArt(width, height) {
 		}
 	}
 
-	// Display the color key
+	// Display the color key as a table with 5 items per row
+	let colorKeyTable = "<table>";
+	let count = 0;
+
 	Object.entries(colorKey).forEach(([key, pixelColor]) => {
 		let hexColor = rgbToHex(pixelColor.r, pixelColor.g, pixelColor.b);
 		let label = key.split('_')[1];
-		colorKeyDiv.innerHTML += `<span class="mr-2">${label}: <span style="color: ${hexColor};">■</span> ${hexColor}</span><br>`;
+		let brickCount = colorKeyCount[key];
+
+		if (count % 5 === 0) {
+			colorKeyTable += "<tr>";
+		}
+		
+		let uuid = reverseLookup(hexColor, bricks);
+
+		colorKeyTable += `<td class="mr-2">${label}: <a target="_blank" rel="noopener noreferrer" href="${getBrickLink(uuid)}">${uuid}</a> <img class="img-sm" src="static/images/${uuid}.jpg"><span>x ${brickCount}</span></td>`;
+
+		count++;
+
+		if (count % 5 === 0) {
+			colorKeyTable += "</tr>";
+		}
 	});
+
+	// If the last row is not complete, close it
+	if (count % 5 !== 0) {
+		colorKeyTable += "</tr>";
+	}
+
+	colorKeyTable += "</table>";
+
+	colorKeyDiv.innerHTML = colorKeyTable;
+}
+
+function reverseLookup(hexColor, bricksObject) {
+	for (const [id, color] of Object.entries(bricksObject)) {
+		if (color === hexColor) {
+			return id;
+		}
+	}
+	return null; // Return null if no matching id is found
 }
 
 function findColorKey(colorKey, pixelColor) {
@@ -154,6 +239,7 @@ function drawNumberedCircle(x, y, radius, color, label) {
 
 function getAverageColor(x, y, radius) {
 	var imageData = scaledCtx.getImageData(x - radius, y - radius, radius * 2, radius * 2).data;
+
 	let totalR = 0;
 	let totalG = 0;
 	let totalB = 0;
@@ -172,7 +258,41 @@ function getAverageColor(x, y, radius) {
 	let avgB = Math.round(totalB / pixelCount);
 	let avgA = Math.round(totalA / pixelCount);
 
-	return { r: avgR, g: avgG, b: avgB, a: avgA };
+	// Find the closest color in the bricks object
+	let closestColorKey = findClosestColor(avgR, avgG, avgB);
+	return hexToRgb(bricks[closestColorKey]);
+}
+
+function findClosestColor(r, g, b) {
+	let closestKey = null;
+	let closestDistance = Infinity;
+
+	for (let key in bricks) {
+		let brickColor = bricks[key];
+		let brickRgb = hexToRgb(brickColor);
+		let distance = colorDistance(r, g, b, brickRgb.r, brickRgb.g, brickRgb.b);
+
+		if (distance < closestDistance) {
+			closestDistance = distance;
+			closestKey = key;
+		}
+	}
+
+	return closestKey;
+}
+
+function hexToRgb(hex) {
+	// Convert hex color code to RGB
+	let bigint = parseInt(hex.slice(1), 16);
+	let r = (bigint >> 16) & 255;
+	let g = (bigint >> 8) & 255;
+	let b = bigint & 255;
+	return { r, g, b };
+}
+
+function colorDistance(r1, g1, b1, r2, g2, b2) {
+	// Calculate the Euclidean distance between two RGB colors
+	return Math.sqrt(Math.pow(r1 - r2, 2) + Math.pow(g1 - g2, 2) + Math.pow(b1 - b2, 2));
 }
 
 function colorsMatch(color1, color2) {
@@ -195,4 +315,25 @@ function getContrastColor(r, g, b) {
 
 	// Use white or black text depending on the luminance
 	return luminance > 0.5 ? 'black' : 'white';
+}
+
+function generatePdf() {
+	let jsPdf = new jsPDF('p', 'pt', 'letter');
+	var htmlElement = document.getElementById('instructions');
+	const opt = {
+		callback: function (jsPdf) {
+			jsPdf.save("mosaic-instructions.pdf");
+		},
+		margin: [72, 72, 72, 72],
+		autoPaging: 'text',
+		html2canvas: {
+			allowTaint: true,
+			dpi: 300,
+			letterRendering: true,
+			logging: false,
+			scale: .8
+		}
+	};
+
+	jsPdf.html(htmlElement, opt);
 }

@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Lego Art</title>
         <link rel="shortcut icon" href="static/favicon.ico" type="image/x-icon">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans">
         <link
             href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
             rel="stylesheet"
@@ -15,26 +16,41 @@
         <link rel="stylesheet" href="static/style.css">
     </head>
     <body>
-        <div class="d-flex">
-            <div class="m-5">
-                <h1 class="lego-h1">Lego Art</h1>
+        <div class="d-flex pt-5">
+            <div class="m-auto">
+                <h1 class="LegoBlocks text-center">Lego Art</h1>
                 <div class="pt-3">
-                    <label class="form-label" for="customFile">Upload an image:</label>
+                    <label class="form-label pt-sans" for="customFile">Upload an image:</label>
                     <input
                         type="file"
                         class="form-control"
                         id="imageInput"
                         accept="image/*"
                     >
-                    <canvas id="scaledCanvas" class="d-none"></canvas>
                 </div>
-				<label class="form-label" for="customWidth">Output width:</label>
-				<input id="customWidth" class="form-control" type="number" value="16" min="1" max="50" onchange="handleHeightWidthChange()">
-				<label class="form-label" for="customHeight">Output height:</label>
-				<input id="customHeight" class="form-control" type="number" value="16" min="1" max="50" onchange="handleHeightWidthChange()">
-                <div class="dropdown pt-3">
+                <label class="form-label pt-sans" for="customWidth">Output width:</label>
+                <input
+                    id="customWidth"
+                    class="form-control"
+                    type="number"
+                    value="16"
+                    min="1"
+                    max="50"
+                    onchange="handleHeightWidthChange()"
+                >
+                <label class="form-label pt-sans" for="customHeight">Output height:</label>
+                <input
+                    id="customHeight"
+                    class="form-control"
+                    type="number"
+                    value="16"
+                    min="1"
+                    max="50"
+                    onchange="handleHeightWidthChange()"
+                >
+                <div class="dropdown pt-3 text-center">
                     <button
-                        class="btn btn-secondary dropdown-toggle"
+                        class="btn btn-secondary dropdown-toggle pt-sans"
                         type="button"
                         id="legoBoardColorButton"
                         data-bs-toggle="dropdown"
@@ -43,7 +59,7 @@
                     >
                         Set board color
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="#legoBoardColorButton">
+                    <ul class="dropdown-menu pt-sans" aria-labelledby="#legoBoardColorButton">
                         <li>
                             <button class="dropdown-item" data-color="black" onclick="setBoardColor('black')">black</button>
                         </li>
@@ -109,34 +125,101 @@
                         </li>
                     </ul>
                 </div>
-				<div class="pt-3">
-					<button type="button" class="btn btn-outline-primary" onclick="handleImageUpload()">Generate</button>
-				</div>
-                <div id="output" class="container pt-3">
-                    <div class="row">
-                        <div class="col-auto">
-                            <div id="colorKey" class="list-group">
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <div class="position-relative">
-                                <canvas
-                                    class="position-absolute"
-                                    id="pixelArtCanvas"
-                                    width="432"
-                                    height="432"
-                                    style="z-index:10;"
-                                ></canvas>
-                                <div class="board position-absolute" style="z-index:1;">
-                                    <div id="legoBoard" class="brick b-16x16 b-white"></div>
+                <div class="pt-3 text-center">
+                    <button
+                        type="button"
+                        class="btn btn-outline-primary pt-sans"
+                        data-bs-toggle="modal"
+                        data-bs-target="#staticBackdrop"
+                        onclick="handleImageUpload()"
+                    >
+                        Generate Instructions
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div
+            class="modal fade"
+            id="staticBackdrop"
+            data-bs-backdrop="static"
+            data-bs-keyboard="false"
+            tabindex="-1"
+            aria-labelledby="staticBackdropLabel"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-content modal-tall">
+                    <div class="modal-header">
+                        <h5 class="modal-title pt-sans" id="staticBackdropLabel">Instructions</h5>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="instructions" class="container pt-3">
+                            <div class="row pt-2">
+                                <div class="col-auto">
+                                    <div class="w-15 border rounded p-2">
+                                        <div class="brick b-4x2 b-red mb-3"></div>
+                                        <span class="mark pt-sans" contenteditable="true">Custom Title</span>
+                                        <br>
+                                        <hr>
+                                        <span class="pt-sans">
+                                            <span id="piecesCount">0</span>
+                                            <span class="small"> pcs</span>
+                                        </span>
+                                        <br>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <h2>Pieces List</h2>
+                                    <div class="mt-2 alert alert-warning pt-sans" role="alert">⚠️ The base plate is not listed in the pieces list - you will need to source or make your own to fit the dimensions!</div>
+                                    <div id="colorKey" class="list-group pt-sans"></div>
                                 </div>
                             </div>
+                            <hr>
+                            <h2 class="pt-sans">Template / Build-by-numbers</h2>
+                            <div class="row pt-2">
+                                <div class="col">
+                                    <canvas id="scaledCanvas"></canvas>
+                                </div>
+                                <div class="col">
+                                    <canvas
+                                        class="position-absolute"
+                                        id="pixelArtCanvas"
+                                        width="432"
+                                        height="432"
+                                        style="z-index:10;"
+                                    ></canvas>
+                                    <div class="board position-absolute" style="z-index:1;">
+                                        <div id="legoBoard" class="brick b-16x16 b-white"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="position-relative p-2"></div>
                         </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="generatePdf()">Save as PDF</button>
                     </div>
                 </div>
             </div>
         </div>
         <script src="static/main.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+            integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        ></script>
+        <script>
+window.jsPDF = window.jspdf.jsPDF;
+        </script>
     </body>
 </html>

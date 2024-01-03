@@ -52,7 +52,7 @@ npm i -g sass
 Generate CSS from SCSS:
 
 ```sh
-sass style.scss style.css
+sass static/style.scss static/style.css
 ```
 
 ### Update necessary docs

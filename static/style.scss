@@ -1,11 +1,15 @@
 @font-face {
     font-family: 'LegoBlocks';
-    src: url(static/fonts/LegoBlocks-9G77.ttf) format('truetype');
+    src: url(fonts/LegoBlocks-9G77.ttf) format('truetype');
     font-weight: normal;
     font-style: normal;
 }
 
-.lego-h1 {
+.pt-sans {
+    font-family: 'PT Sans';
+}
+
+.LegoBlocks {
     font-family: 'LegoBlocks';
 }
 
@@ -25,9 +29,22 @@ body * {
     box-sizing: border-box;
 }
 
-#colorKey {
-    height: 432px;
-    overflow-y: auto;
+.modal-tall {
+    height: 95vh;
+}
+
+// small horizonal line
+.hr-sm {
+    width: 25px;
+}
+
+.w-15 {
+    width: 15%;
+}
+
+.img-sm {
+    height: 32px;
+    width: 32px;
 }
 
 .board {
