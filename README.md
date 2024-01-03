@@ -6,7 +6,7 @@
 
 ## How to use
 
-1. Visit a live demo [here](cutwell.github.io/lego-art).
+1. Visit a live demo [here](https://cutwell.github.io/lego-art/).
 
 2. Upload an image.
 
