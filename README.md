@@ -4,6 +4,9 @@
 <!-- Find new badges at https://shields.io/badges -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+- Generate mosaics / instructions from images.
+- Make custom LEGO art by [buying bricks](https://www.lego.com/en-gb/pick-and-build/pick-a-brick?perPage=400&designNumber=35381) to match output colors.
+
 ## How to use
 
 1. Visit a live demo [here](https://cutwell.github.io/lego-art/).
