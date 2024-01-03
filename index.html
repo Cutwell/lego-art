@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Lego Art</title>
+        <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+            crossorigin="anonymous"
+        >
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="d-flex">
+            <div class="m-5">
+                <h1 class="lego-h1">Lego Art</h1>
+                <div class="pt-3">
+                    <label class="form-label" for="customFile">Upload an image:</label>
+                    <input
+                        type="file"
+                        class="form-control"
+                        id="imageInput"
+                        accept="image/*"
+                    >
+                    <canvas id="scaledCanvas" class="d-none"></canvas>
+                </div>
+				<label class="form-label" for="customWidth">Output width:</label>
+				<input id="customWidth" class="form-control" type="number" value="16" min="1" max="50" onchange="handleHeightWidthChange()">
+				<label class="form-label" for="customHeight">Output height:</label>
+				<input id="customHeight" class="form-control" type="number" value="16" min="1" max="50" onchange="handleHeightWidthChange()">
+                <div class="dropdown pt-3">
+                    <button
+                        class="btn btn-secondary dropdown-toggle"
+                        type="button"
+                        id="legoBoardColorButton"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                        data-bs-auto-close="true"
+                    >
+                        Set board color
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="#legoBoardColorButton">
+                        <li>
+                            <button class="dropdown-item" data-color="black" onclick="setBoardColor('black')">black</button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-color="white" onclick="setBoardColor('white')">white</button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-color="red" onclick="setBoardColor('red')">red</button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-color="pink" onclick="setBoardColor('pink')">pink</button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-color="purple" onclick="setBoardColor('purple')">purple</button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-color="deep-purple" onclick="setBoardColor('deep-purple')">deep-purple</button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-color="indigo" onclick="setBoardColor('indigo')">indigo</button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-color="blue" onclick="setBoardColor('blue')">blue</button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-color="light-blue" onclick="setBoardColor('light-blue')">light-blue</button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-color="cyan" onclick="setBoardColor('cyan')">cyan</button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-color="teal" onclick="setBoardColor('teal')">teal</button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-color="green" onclick="setBoardColor('green')">green</button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-color="light-green" onclick="setBoardColor('light-green')">light-green</button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-color="lime" onclick="setBoardColor('lime')">lime</button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-color="yellow" onclick="setBoardColor('yellow')">yellow</button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-color="amber" onclick="setBoardColor('amber')">amber</button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-color="orange" onclick="setBoardColor('orange')">orange</button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-color="deep-orange" onclick="setBoardColor('deep-orange')">deep-orange</button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-color="brown" onclick="setBoardColor('brown')">brown</button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-color="grey" onclick="setBoardColor('grey')">grey</button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item" data-color="blue-grey" onclick="setBoardColor('blue-grey')">blue-grey</button>
+                        </li>
+                    </ul>
+                </div>
+				<div class="pt-3">
+					<button type="button" class="btn btn-outline-primary" onclick="handleImageUpload()">Generate</button>
+				</div>
+                <div id="output" class="container pt-3">
+                    <div class="row">
+                        <div class="col-auto">
+                            <div id="colorKey" class="list-group">
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="position-relative">
+                                <canvas
+                                    class="position-absolute"
+                                    id="pixelArtCanvas"
+                                    width="432"
+                                    height="432"
+                                    style="z-index:10;"
+                                ></canvas>
+                                <div class="board position-absolute" style="z-index:1;">
+                                    <div id="legoBoard" class="brick b-16x16 b-white"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="main.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    </body>
+</html>
