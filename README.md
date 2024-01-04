@@ -7,6 +7,8 @@
 - Generate mosaics / instructions from images.
 - Make custom LEGO art by [buying bricks](https://www.lego.com/en-gb/pick-and-build/pick-a-brick?perPage=400&designNumber=35381) to match output colors.
 
+![An example instruction set for a mosaic of Starry Night by Van Gogh.](https://github.com/Cutwell/lego-art/blob/main/examples/Starry%20Night%2016x16.png)
+
 ## How to use
 
 1. Visit a live demo [here](https://cutwell.github.io/lego-art/).
