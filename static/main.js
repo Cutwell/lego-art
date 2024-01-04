@@ -349,7 +349,21 @@ function getContrastColor(r, g, b) {
 
 function generatePdf() {
 	let htmlElement = document.getElementById('instructions');
-	let pdf = html2pdf(htmlElement);
-	console.log(pdf);
+	let pdf = html2pdf(htmlElement, {
+		margin: 1,
+		filename: 'mosaic-instructions.pdf',
+		image: { type: 'jpeg', quality: 0.98 },
+		html2canvas: {
+			allowTaint: true,
+			useCORS: true,
+			scale: 2,
+			dpi: 300, letterRendering: true,
+		},
+		jsPDF: {
+			unit: 'in',
+			format: 'a4',
+			orientation: 'portrait',
+		},
+	});
 	pdf.save();
 }
