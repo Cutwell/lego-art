@@ -145,16 +145,16 @@
             </div>
         </div>
         <div
-            class="modal fade"
+            class="modal top fade"
             id="staticBackdrop"
             data-bs-backdrop="static"
-            data-bs-keyboard="false"
+            data-bs-keyboard="true"
             tabindex="-1"
             aria-labelledby="staticBackdropLabel"
             aria-hidden="true"
         >
-            <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                <div class="modal-content modal-tall">
+            <div class="modal-dialog modal-xl  modal-dialog-centered">
+                <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title pt-sans" id="staticBackdropLabel">Instructions</h5>
                         <button
@@ -193,22 +193,17 @@
                             <h3 class="pt-sans">Template / Build-by-numbers</h3>
                             <div class="row pt-2">
                                 <div class="col-auto">
-                                    <canvas id="scaledCanvas"></canvas>
+                                    <canvas class="board" id="scaledCanvas"></canvas>
                                 </div>
                                 <div class="col-auto">
                                     <canvas
-                                        class="position-absolute"
+                                        class="board brick b-16x16 b-white"
                                         id="pixelArtCanvas"
                                         width="432"
                                         height="432"
-                                        style="z-index:10;"
                                     ></canvas>
-                                    <div class="board position-absolute" style="z-index:1;">
-                                        <div id="legoBoard" class="brick b-16x16 b-white"></div>
-                                    </div>
                                 </div>
                             </div>
-                            <div class="position-relative p-2"></div>
                         </div>
                     </div>
                     <div class="modal-footer">

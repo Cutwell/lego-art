@@ -350,7 +350,7 @@ function getContrastColor(r, g, b) {
 
 function capture() {
 	// Get the scrollable div
-	var captureDiv = document.getElementById('instructions');
+	var captureDiv = document.getElementById('');
 
 	// Create a canvas with dimensions equal to the scrollable content
 	html2canvas(captureDiv, { height: captureDiv.scrollHeight, width: captureDiv.scrollWidth }).then(function (canvas) {
@@ -360,7 +360,6 @@ function capture() {
 		// Optionally, you can download the image
 		var link = document.createElement('a');
 		link.href = imageData;
-		link.download = `${mosaicTitle.innerText}.png`;
 
 		link.click();
 	});
