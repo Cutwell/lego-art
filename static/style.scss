@@ -5,6 +5,11 @@
     font-style: normal;
 }
 
+#scaledCanvas {
+    height: 200px;
+    width: 200px;
+}
+
 .pt-sans {
     font-family: 'PT Sans';
 }
@@ -36,10 +41,6 @@ body * {
 // small horizonal line
 .hr-sm {
     width: 25px;
-}
-
-.w-15 {
-    width: 15%;
 }
 
 .img-sm {

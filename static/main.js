@@ -9,6 +9,9 @@ const colorKeyDiv = document.getElementById('colorKey');
 const instructionsDiv = document.getElementById('instructions');
 const heightInput = document.getElementById('customHeight');
 const widthInput = document.getElementById('customWidth');
+const piecesCount = document.getElementById('piecesCount');
+const generateButtonSpinner = document.getElementById('generateButtonSpinner');
+const generateButtonText = document.getElementById('generateButtonText');
 var colorKey = {};
 var colorKeyCount = {};
 var customWidth = 16;
@@ -96,48 +99,71 @@ function setBoardColor(color) {
 	dropdown.hide();
 }
 
-function handleImageUpload() {
-	var file = imageInput.files[0];
-	if (file) {
-		var reader = new FileReader();
-		reader.onload = function (e) {
-			let heightPixels = 27 * customHeight;
-			let widthPixels = 27 * customWidth;
+async function handleImageUpload() {
+	// set button to loading text
+	generateButtonSpinner.classList.remove('d-none');
+	generateButtonSpinner.classList.add('d-block');
+	generateButtonText.innerText = 'Loading..';
 
-			pixelArtCanvas.width = widthPixels;
-			pixelArtCanvas.height = heightPixels;
-
-			var img = new Image();
-			img.onload = function () {
-				// Scale the image to fit within 432x432
-				var scaleFactor = Math.max(widthPixels / img.width, heightPixels / img.height);
-				var scaledWidth = img.width * scaleFactor;
-				var scaledHeight = img.height * scaleFactor;
-
-				scaledCanvas.width = scaledWidth;
-				scaledCanvas.height = scaledHeight;
-
-				// clear the canvas
-				scaledCtx.clearRect(0, 0, scaledCanvas.width, scaledCanvas.height);
-				pixelArtCtx.clearRect(0, 0, pixelArtCanvas.width, pixelArtCanvas.height);
-
-				// Draw the scaled image on the scaledCanvas
-				scaledCtx.drawImage(img, 0, 0, scaledWidth, scaledHeight);
-
-				// Draw pixel art
-				drawPixelArt(scaledWidth, scaledHeight);
-			};
-			img.src = e.target.result;
-		};
-		reader.readAsDataURL(file);
+	let processImagePromise;
+	try {
+		processImagePromise = processImage();
 	}
+	catch (ex) {
+		console.error(`Something went wrong during processImage(): ${ex}`);
+	}
+
+	// reset button text
+	generateButtonSpinner.classList.remove('d-block');
+	generateButtonSpinner.classList.add('d-none');
+	generateButtonText.innerText = 'Generate Instructions';
+}
+
+function processImage() {
+	return new Promise((resolve, reject) => {
+		var file = imageInput.files[0];
+		if (file) {
+			var reader = new FileReader();
+			reader.onload = function (e) {
+				let heightPixels = 27 * customHeight;
+				let widthPixels = 27 * customWidth;
+
+				pixelArtCanvas.width = widthPixels;
+				pixelArtCanvas.height = heightPixels;
+
+				var img = new Image();
+				img.onload = function () {
+					// Scale the image to fit within 432x432
+					var scaleFactor = Math.max(widthPixels / img.width, heightPixels / img.height);
+					var scaledWidth = img.width * scaleFactor;
+					var scaledHeight = img.height * scaleFactor;
+
+					scaledCanvas.width = scaledWidth;
+					scaledCanvas.height = scaledHeight;
+
+					// clear the canvas
+					scaledCtx.clearRect(0, 0, scaledCanvas.width, scaledCanvas.height);
+					pixelArtCtx.clearRect(0, 0, pixelArtCanvas.width, pixelArtCanvas.height);
+
+					// Draw the scaled image on the scaledCanvas
+					scaledCtx.drawImage(img, 0, 0, scaledWidth, scaledHeight);
+
+					// Draw pixel art
+					drawPixelArt(scaledWidth, scaledHeight);
+				};
+				img.src = e.target.result;
+			};
+			reader.readAsDataURL(file);
+		}
+	})
+
 }
 
 function drawPixelArt(width, height) {
 	var circleRadius = 13.5; // Half of the circle's size
 	var padding = 0;
-	var offsetX = 0;
-	var offsetY = 0;
+	var offsetX = circleRadius * 2;
+	var offsetY = circleRadius * 2;
 	var colorKey = {};
 	var colorKeyCount = {};
 	let colorNumber = 1;
@@ -145,8 +171,8 @@ function drawPixelArt(width, height) {
 	pixelArtCtx.clearRect(0, 0, width, height); // Clear the canvas before redrawing
 	colorKeyDiv.innerHTML = ''; // Clear the color key
 
-	for (let x = offsetX; x < width; x += (circleRadius * 2) + padding) {
-		for (let y = offsetY; y < height; y += (circleRadius * 2) + padding) {
+	for (let x = offsetX; x < width + offsetX; x += (circleRadius * 2) + padding) {
+		for (let y = offsetY; y < height + offsetY; y += (circleRadius * 2) + padding) {
 			let pixelColor = getAverageColor(x, y, circleRadius);
 
 			// Check if the color is already in the color key
@@ -164,23 +190,25 @@ function drawPixelArt(width, height) {
 			let label = key.split('_')[1];
 
 			// Draw the numbered circle
-			drawNumberedCircle(x, y, circleRadius, color, label);
+			drawNumberedCircle(x - offsetX, y - offsetY, circleRadius, color, label);
 		}
 	}
 
 	// Display the color key as a table with 5 items per row
 	let colorKeyTable = "<table>";
 	let count = 0;
+	let piecesCountTotal = 0;
 
 	Object.entries(colorKey).forEach(([key, pixelColor]) => {
 		let hexColor = rgbToHex(pixelColor.r, pixelColor.g, pixelColor.b);
 		let label = key.split('_')[1];
 		let brickCount = colorKeyCount[key];
+		piecesCountTotal += brickCount;
 
 		if (count % 5 === 0) {
 			colorKeyTable += "<tr>";
 		}
-		
+
 		let uuid = reverseLookup(hexColor, bricks);
 
 		colorKeyTable += `<td class="mr-2">${label}: <a target="_blank" rel="noopener noreferrer" href="${getBrickLink(uuid)}">${uuid}</a> <img class="img-sm" src="static/images/${uuid}.jpg"><span>x ${brickCount}</span></td>`;
@@ -200,6 +228,8 @@ function drawPixelArt(width, height) {
 	colorKeyTable += "</table>";
 
 	colorKeyDiv.innerHTML = colorKeyTable;
+
+	piecesCount.innerText = piecesCountTotal;
 }
 
 function reverseLookup(hexColor, bricksObject) {
@@ -318,22 +348,8 @@ function getContrastColor(r, g, b) {
 }
 
 function generatePdf() {
-	let jsPdf = new jsPDF('p', 'pt', 'letter');
-	var htmlElement = document.getElementById('instructions');
-	const opt = {
-		callback: function (jsPdf) {
-			jsPdf.save("mosaic-instructions.pdf");
-		},
-		margin: [72, 72, 72, 72],
-		autoPaging: 'text',
-		html2canvas: {
-			allowTaint: true,
-			dpi: 300,
-			letterRendering: true,
-			logging: false,
-			scale: .8
-		}
-	};
-
-	jsPdf.html(htmlElement, opt);
+	let htmlElement = document.getElementById('instructions');
+	let pdf = html2pdf(htmlElement);
+	console.log(pdf);
+	pdf.save();
 }
