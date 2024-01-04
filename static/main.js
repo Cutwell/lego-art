@@ -364,7 +364,7 @@ function generatePdf() {
 			format: 'a4',
 			orientation: 'landscape',
 		},
-		pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+		mode: 'avoid-all', before: '#pageBreak'
 	});
 	pdf.save();
 }
