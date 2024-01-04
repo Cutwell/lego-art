@@ -3,7 +3,6 @@ const pixelArtCanvas = document.getElementById('pixelArtCanvas');
 const scaledCanvas = document.getElementById('scaledCanvas');
 const pixelArtCtx = pixelArtCanvas.getContext('2d');
 const scaledCtx = scaledCanvas.getContext('2d');
-const legoBoard = document.getElementById('legoBoard');
 const legoBoardColorButton = document.getElementById('legoBoardColorButton');
 const colorKeyDiv = document.getElementById('colorKey');
 const instructionsDiv = document.getElementById('instructions');
@@ -89,9 +88,9 @@ function setBoardColor(color) {
 	clickedButton.setAttribute('aria-current', 'true');
 
 	// update UI elements and lego brick board with target color
-	legoBoard.classList.remove(`b-${customColor}`);
+	pixelArtCanvas.classList.remove(`b-${customColor}`);
 	customColor = color;
-	legoBoard.classList.add(`b-${customColor}`);
+	pixelArtCanvas.classList.add(`b-${customColor}`);
 	let buttonTextColor = (color == 'white') ? 't-black' : 't-white';
 	legoBoardColorButton.className = `btn btn-secondary dropdown-toggle pt-sans bg-${color} ${buttonTextColor}`
 
@@ -350,7 +349,7 @@ function getContrastColor(r, g, b) {
 
 function capture() {
 	// Get the scrollable div
-	var captureDiv = document.getElementById('');
+	var captureDiv = document.getElementById('instructions');
 
 	// Create a canvas with dimensions equal to the scrollable content
 	html2canvas(captureDiv, { height: captureDiv.scrollHeight, width: captureDiv.scrollWidth }).then(function (canvas) {
