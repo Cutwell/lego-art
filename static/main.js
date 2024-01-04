@@ -12,6 +12,7 @@ const widthInput = document.getElementById('customWidth');
 const piecesCount = document.getElementById('piecesCount');
 const generateButtonSpinner = document.getElementById('generateButtonSpinner');
 const generateButtonText = document.getElementById('generateButtonText');
+const mosaicTitle = document.getElementById('mosaicTitle');
 var colorKey = {};
 var colorKeyCount = {};
 var customWidth = 16;
@@ -347,24 +348,16 @@ function getContrastColor(r, g, b) {
 	return luminance > 0.5 ? 'black' : 'white';
 }
 
-function generatePdf() {
-	let htmlElement = document.getElementById('instructions');
-	let pdf = html2pdf(htmlElement, {
-		margin: 1,
-		filename: 'mosaic-instructions.pdf',
-		image: { type: 'jpeg', quality: 0.98 },
-		html2canvas: {
-			allowTaint: true,
-			useCORS: true,
-			scale: 2,
-			dpi: 300, letterRendering: true,
-		},
-		jsPDF: {
-			unit: 'in',
-			format: 'a4',
-			orientation: 'landscape',
-		},
-		mode: 'avoid-all', before: '#pageBreak'
-	});
-	pdf.save();
-}
+function capture() {
+    // Capture the div
+    html2canvas(document.getElementById('instructions')).then(function(canvas) {
+      // Convert canvas to PNG image data
+      var imageData = canvas.toDataURL('image/png');
+
+      // Optionally, you can download the image
+      var link = document.createElement('a');
+      link.href = imageData;
+      link.download = `${mosaicTitle}.png`;
+      link.click();
+    });
+  }
