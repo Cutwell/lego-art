@@ -349,15 +349,19 @@ function getContrastColor(r, g, b) {
 }
 
 function capture() {
-    // Capture the div
-    html2canvas(document.getElementById('instructions')).then(function(canvas) {
-      // Convert canvas to PNG image data
-      var imageData = canvas.toDataURL('image/png');
+	// Get the scrollable div
+	var captureDiv = document.getElementById('instructions');
 
-      // Optionally, you can download the image
-      var link = document.createElement('a');
-      link.href = imageData;
-      link.download = `${mosaicTitle}.png`;
-      link.click();
-    });
-  }
+	// Create a canvas with dimensions equal to the scrollable content
+	html2canvas(captureDiv, { height: captureDiv.scrollHeight, width: captureDiv.scrollWidth }).then(function (canvas) {
+		// Convert canvas to PNG image data
+		var imageData = canvas.toDataURL('image/png');
+
+		// Optionally, you can download the image
+		var link = document.createElement('a');
+		link.href = imageData;
+		link.download = `${mosaicTitle.innerText}.png`;
+
+		link.click();
+	});
+}
