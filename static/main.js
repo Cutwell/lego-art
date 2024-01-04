@@ -362,8 +362,9 @@ function generatePdf() {
 		jsPDF: {
 			unit: 'in',
 			format: 'a4',
-			orientation: 'portrait',
+			orientation: 'landscape',
 		},
+		pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
 	});
 	pdf.save();
 }
