@@ -359,7 +359,7 @@ function capture() {
 		// Optionally, you can download the image
 		var link = document.createElement('a');
 		link.href = imageData;
-
+		link.download = `${mosaicTitle.innerText}.png`
 		link.click();
 	});
 }
