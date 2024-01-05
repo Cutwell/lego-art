@@ -4,9 +4,13 @@
   font-weight: normal;
   font-style: normal;
 }
-#scaledCanvas {
+#thumbnailCanvas {
   height: 200px;
   width: 200px;
+}
+
+#pixelArtCanvas {
+  padding: 0;
 }
 
 .pt-sans {

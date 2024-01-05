@@ -1,8 +1,10 @@
 const imageInput = document.getElementById('imageInput');
 const pixelArtCanvas = document.getElementById('pixelArtCanvas');
 const scaledCanvas = document.getElementById('scaledCanvas');
+const thumbnailCanvas = document.getElementById('thumbnailCanvas');
 const pixelArtCtx = pixelArtCanvas.getContext('2d');
 const scaledCtx = scaledCanvas.getContext('2d');
+const thumbnailCtx = thumbnailCanvas.getContext('2d');
 const legoBoardColorButton = document.getElementById('legoBoardColorButton');
 const colorKeyDiv = document.getElementById('colorKey');
 const instructionsDiv = document.getElementById('instructions');
@@ -66,12 +68,12 @@ function getBrickLink(uuid) {
 
 function handleHeightWidthChange() {
 	// remove the outdated width and height class
-	legoBoard.classList.remove(`b-${customWidth}x${customHeight}`);
+	pixelArtCanvas.classList.remove(`b-${customWidth}x${customHeight}`);
 
 	// update with new height and width
 	customHeight = heightInput.value;
 	customWidth = widthInput.value;
-	legoBoard.classList.add(`b-${customWidth}x${customHeight}`);
+	pixelArtCanvas.classList.add(`b-${customWidth}x${customHeight}`);
 }
 
 function setBoardColor(color) {
@@ -131,25 +133,32 @@ function processImage() {
 				pixelArtCanvas.width = widthPixels;
 				pixelArtCanvas.height = heightPixels;
 
+				scaledCanvas.height = customHeight;
+				scaledCanvas.width = customWidth;
+
 				var img = new Image();
 				img.onload = function () {
-					// Scale the image to fit within 432x432
+					// Scale the image to fit
 					var scaleFactor = Math.max(widthPixels / img.width, heightPixels / img.height);
 					var scaledWidth = img.width * scaleFactor;
 					var scaledHeight = img.height * scaleFactor;
 
-					scaledCanvas.width = scaledWidth;
-					scaledCanvas.height = scaledHeight;
+					thumbnailCanvas.width = scaledWidth;
+					thumbnailCanvas.height = scaledHeight;
 
 					// clear the canvas
 					scaledCtx.clearRect(0, 0, scaledCanvas.width, scaledCanvas.height);
 					pixelArtCtx.clearRect(0, 0, pixelArtCanvas.width, pixelArtCanvas.height);
+					thumbnailCtx.clearRect(0, 0, thumbnailCanvas.width, thumbnailCanvas.height);
 
 					// Draw the scaled image on the scaledCanvas
-					scaledCtx.drawImage(img, 0, 0, scaledWidth, scaledHeight);
+					scaledCtx.drawImage(img, 0, 0, img.width, img.height, 0, 0, customWidth, customHeight);
+					
+					// Draw thumbnail on thumbnailCanvas
+					thumbnailCtx.drawImage(img, 0, 0, scaledWidth, scaledHeight)
 
-					// Draw pixel art
-					drawPixelArt(scaledWidth, scaledHeight);
+					// Draw pixel art on pixelArtCanvas
+					drawPixelArt(customWidth, customHeight);
 				};
 				img.src = e.target.result;
 			};
@@ -161,9 +170,6 @@ function processImage() {
 
 function drawPixelArt(width, height) {
 	var circleRadius = 13.5; // Half of the circle's size
-	var padding = 0;
-	var offsetX = circleRadius * 2;
-	var offsetY = circleRadius * 2;
 	var colorKey = {};
 	var colorKeyCount = {};
 	let colorNumber = 1;
@@ -171,26 +177,33 @@ function drawPixelArt(width, height) {
 	pixelArtCtx.clearRect(0, 0, width, height); // Clear the canvas before redrawing
 	colorKeyDiv.innerHTML = ''; // Clear the color key
 
-	for (let x = offsetX; x < width + offsetX; x += (circleRadius * 2) + padding) {
-		for (let y = offsetY; y < height + offsetY; y += (circleRadius * 2) + padding) {
-			let pixelColor = getAverageColor(x, y, circleRadius);
+	for (let x = 0; x < width; x += 1) {
+		for (let y = 0; y < height; y += 1) {
+			let pixelRGBA = getPixelColor(x, y);
 
-			// Check if the color is already in the color key
-			var key = findColorKey(colorKey, pixelColor);
-			if (key === null) {
-				key = `color_${colorNumber}`;
-				colorKey[key] = pixelColor;
-				colorKeyCount[key] = 1;
-				colorNumber++;
-			} else {
-				colorKeyCount[key]++;
+			// skip if pixel is transparent
+			if (pixelRGBA.a != 0) {
+				// Find the closest color in the bricks object
+				let closestColorKey = findClosestColor(pixelRGBA.r, pixelRGBA.g, pixelRGBA.b);
+				let pixelColor = hexToRgb(bricks[closestColorKey]);
+
+				// Check if the color is already in the color key
+				var key = findColorKey(colorKey, pixelColor);
+				if (key === null) {
+					key = `color_${colorNumber}`;
+					colorKey[key] = pixelColor;
+					colorKeyCount[key] = 1;
+					colorNumber++;
+				} else {
+					colorKeyCount[key]++;
+				}
+
+				let color = colorKey[key];
+				let label = key.split('_')[1];
+
+				// Draw the numbered circle
+				drawNumberedCircle(x * (circleRadius * 2), y * (circleRadius * 2), circleRadius, color, label);
 			}
-
-			let color = colorKey[key];
-			let label = key.split('_')[1];
-
-			// Draw the numbered circle
-			drawNumberedCircle(x - offsetX, y - offsetY, circleRadius, color, label);
 		}
 	}
 
@@ -267,30 +280,15 @@ function drawNumberedCircle(x, y, radius, color, label) {
 	pixelArtCtx.fillText(label, x + radius, y + radius + 3);
 }
 
-function getAverageColor(x, y, radius) {
-	var imageData = scaledCtx.getImageData(x - radius, y - radius, radius * 2, radius * 2).data;
+function getPixelColor(x, y) {
+	var imageData = scaledCtx.getImageData(x, y, 1, 1).data;
 
-	let totalR = 0;
-	let totalG = 0;
-	let totalB = 0;
-	let totalA = 0; // Alpha (transparency)
-	var pixelCount = (radius * 2) * (radius * 2);
+	let r = imageData[0];
+	let g = imageData[1];
+	let b = imageData[2];
+	let a = imageData[3];
 
-	for (let i = 0; i < pixelCount * 4; i += 4) {
-		totalR += imageData[i];
-		totalG += imageData[i + 1];
-		totalB += imageData[i + 2];
-		totalA += imageData[i + 3];
-	}
-
-	let avgR = Math.round(totalR / pixelCount);
-	let avgG = Math.round(totalG / pixelCount);
-	let avgB = Math.round(totalB / pixelCount);
-	let avgA = Math.round(totalA / pixelCount);
-
-	// Find the closest color in the bricks object
-	let closestColorKey = findClosestColor(avgR, avgG, avgB);
-	return hexToRgb(bricks[closestColorKey]);
+	return { r, g, b, a };
 }
 
 function findClosestColor(r, g, b) {
